@@ -6,17 +6,22 @@ HW_SOURCE_FILE = 'hw02.py'
 
 from operator import add, mul
 
+
 def square(x):
     return x * x
+
 
 def triple(x):
     return 3 * x
 
+
 def identity(x):
     return x
 
+
 def increment(x):
     return x + 1
+
 
 def summation(n, term):
     """Return the summation of the first n terms in a sequence.
@@ -33,7 +38,11 @@ def summation(n, term):
     >>> summation(5, square)   # 1^2 + 2^2 + 3^2 + 4^2 + 5^2
     55
     """
-    "*** YOUR CODE HERE ***"
+    total = 0
+    for i in range(1, n + 1):
+        total += term(i)
+    return total
+
 
 def product(n, term):
     """Return the product of the first n terms in a sequence.
@@ -50,10 +59,15 @@ def product(n, term):
     >>> product(5, square)   # 1^2 * 2^2 * 3^2 * 4^2 * 5^2
     14400
     """
-    "*** YOUR CODE HERE ***"
+    product_total = 1
+    for i in range(1, n + 1):
+        product_total *= term(i)
+    return product_total
+
 
 # The identity function, defined using a lambda expression!
 identity = lambda k: k
+
 
 def factorial(n):
     """Return n factorial for n >= 0 by calling product.
@@ -66,8 +80,8 @@ def factorial(n):
     >>> check(HW_SOURCE_FILE, 'factorial', ['Recursion', 'For', 'While'])
     True
     """
-    "*** YOUR CODE HERE ***"
-    return _______
+    return product(n, identity)
+
 
 def make_adder(n):
     """Return a function that takes an argument K and returns N + K.
@@ -78,8 +92,8 @@ def make_adder(n):
     >>> make_adder(1)(2)
     3
     """
-    "*** YOUR CODE HERE ***"
-    # return lambda ________________
+    return lambda x: x + n
+
 
 def accumulate(combiner, base, n, term):
     """Return the result of combining the first n terms in a sequence and base.
@@ -97,7 +111,11 @@ def accumulate(combiner, base, n, term):
     >>> accumulate(mul, 2, 3, square)   # 2 * 1^2 * 2^2 * 3^2
     72
     """
-    "*** YOUR CODE HERE ***"
+    temp = base
+    for i in range(1, n + 1):
+        temp = combiner(temp, term(i))
+    return temp
+
 
 def summation_using_accumulate(n, term):
     """Returns the sum of term(1) + ... + term(n). The implementation
@@ -112,8 +130,8 @@ def summation_using_accumulate(n, term):
     ...       ['Recursion', 'For', 'While'])
     True
     """
-    "*** YOUR CODE HERE ***"
-    return _______
+    return accumulate(add, 0, n, term)
+
 
 def product_using_accumulate(n, term):
     """An implementation of product using accumulate.
@@ -127,8 +145,8 @@ def product_using_accumulate(n, term):
     ...       ['Recursion', 'For', 'While'])
     True
     """
-    "*** YOUR CODE HERE ***"
-    return _______
+    return accumulate(mul, 1, n, term)
+
 
 def filtered_accumulate(combiner, base, pred, n, term):
     """Return the result of combining the terms in a sequence of N terms
@@ -153,15 +171,23 @@ def filtered_accumulate(combiner, base, pred, n, term):
     ...       ['While', 'For', 'Recursion'])
     True
     """
+
     def combine_if(x, y):
-        "*** YOUR CODE HERE ***"
+        if pred(y):
+            return combiner(x, y)
+        else:
+            return x
+
     return accumulate(combine_if, base, n, term)
+
 
 def odd(x):
     return x % 2 == 1
 
+
 def greater_than_5(x):
     return x > 5
+
 
 def repeated(f, n):
     """Return the function that computes the nth application of f.
@@ -178,10 +204,34 @@ def repeated(f, n):
     >>> repeated(square, 0)(5)
     5
     """
-    "*** YOUR CODE HERE ***"
+    if n == 0:
+        return identity
+    else:
+
+        def h(x):
+            return repeated(f, n - 1)(f(x))
+
+        return h
+
 
 def compose1(f, g):
     """Return a function h, such that h(x) = f(g(x))."""
+
     def h(x):
         return f(g(x))
+
     return h
+
+
+def new_accumulate(combiner, base, n, term):
+    temp = base
+    for i in range(1, n + 1):
+        temp = combiner(temp, term)
+    return temp
+
+
+def new_repeadted(f, n):
+    return new_accumulate(compose1, identity, n, f)
+
+
+print(new_repeadted(triple, 5)(1))
